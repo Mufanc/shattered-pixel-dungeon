@@ -44,7 +44,7 @@ public class RingOfGuarding extends Ring {
 	@Override
 	public void reset() {
 		super.reset();
-		image = ItemSpriteSheet.RING_DIAMOND;
+		image = ItemSpriteSheet.RING_GUARDING;
 	}
 
 	@Override

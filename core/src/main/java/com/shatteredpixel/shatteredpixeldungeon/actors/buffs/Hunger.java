@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ScrollOfChallenge;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.SaltCube;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
@@ -92,6 +93,8 @@ public class Hunger extends Buff implements Hero.Doom {
 				}
 				hungerDelay /= SaltCube.hungerGainMultiplier();
 
+				hungerDelay /= RingOfGuarding.hungerMultiplier(target);
+
 				float newLevel = level + (1f/hungerDelay);
 				if (newLevel >= STARVING) {
 
@@ -134,6 +137,10 @@ public class Hunger extends Buff implements Hero.Doom {
 	}
 
 	public void affectHunger(float energy, boolean overrideLimits ) {
+
+		if (energy < 0) {
+			energy *= RingOfGuarding.hungerMultiplier(target);
+		}
 
 		if (energy < 0 && target.buff(WellFed.class) != null){
 			target.buff(WellFed.class).left += energy;

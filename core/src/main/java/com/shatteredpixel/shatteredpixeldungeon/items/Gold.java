@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -59,15 +60,17 @@ public class Gold extends Item {
 	@Override
 	public boolean doPickUp(Hero hero, int pos) {
 
+		int amount = RingOfGuarding.isActive(hero) ? quantity * 2 : quantity;
+
 		Catalog.setSeen(getClass());
 		Statistics.itemTypesDiscovered.add(getClass());
 
-		Dungeon.gold += quantity;
-		Statistics.goldCollected += quantity;
+		Dungeon.gold += amount;
+		Statistics.goldCollected += amount;
 		Badges.validateGoldCollected();
 
 		GameScene.pickUp( this, pos );
-		hero.sprite.showStatusWithIcon( CharSprite.NEUTRAL, Integer.toString(quantity), FloatingText.GOLD );
+		hero.sprite.showStatusWithIcon( CharSprite.NEUTRAL, Integer.toString(amount), FloatingText.GOLD );
 		hero.spendAndNext( pickupDelay() );
 		
 		Sample.INSTANCE.play( Assets.Sounds.GOLD, 1, 1, Random.Float( 0.9f, 1.1f ) );

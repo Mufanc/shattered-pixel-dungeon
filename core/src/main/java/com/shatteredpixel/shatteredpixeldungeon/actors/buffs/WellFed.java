@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.SaltCube;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -59,7 +60,7 @@ public class WellFed extends Buff {
 		}
 
 		//salt cube does slow this buff down, but doesn't lessen the bonus health
-		spend(TICK / SaltCube.hungerGainMultiplier());
+		spend(TICK / (SaltCube.hungerGainMultiplier() * RingOfGuarding.hungerMultiplier(target)));
 		return true;
 	}
 	
@@ -89,13 +90,13 @@ public class WellFed extends Buff {
 
 	@Override
 	public String iconTextDisplay() {
-		int visualLeft = (int)(left / SaltCube.hungerGainMultiplier());
+		int visualLeft = (int)(left / (SaltCube.hungerGainMultiplier() * RingOfGuarding.hungerMultiplier(target)));
 		return Integer.toString(visualLeft+1);
 	}
 	
 	@Override
 	public String desc() {
-		int visualLeft = (int)(left / SaltCube.hungerGainMultiplier());
+		int visualLeft = (int)(left / (SaltCube.hungerGainMultiplier() * RingOfGuarding.hungerMultiplier(target)));
 		return Messages.get(this, "desc", visualLeft + 1);
 	}
 	

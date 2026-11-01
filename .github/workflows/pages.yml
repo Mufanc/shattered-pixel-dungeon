@@ -1,0 +1,59 @@
+name: Deploy Web game to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Build JavaScript game
+        run: >-
+          ./gradlew --no-daemon --max-workers=2
+          :web:gdx_teavm_web_js_build
+          -Pteavm.localNodeJS=true
+          -Pteavm.tests.js=false
+          -Pteavm.tests.wasm-gc=false
+          -Pteavm.tests.c=false
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: web/build/dist/js/webapp
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v6
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

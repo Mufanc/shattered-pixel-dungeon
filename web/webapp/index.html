@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPD Mod</title>
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; color: #ddd; }
+        canvas { display: block; outline: none; }
+        #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 16px; background: #101010; font: 16px system-ui, sans-serif; }
+        #loading[hidden] { display: none; }
+        progress { width: min(280px, 75vw); accent-color: #c8ae5a; }
+        #status { max-width: 80vw; text-align: center; white-space: pre-wrap; }
+    </style>
+</head>
+<body oncontextmenu="return false">
+    <canvas id="canvas" tabindex="0"></canvas>
+    <div id="loading" role="status" aria-live="polite">
+        <strong>SPD Mod</strong>
+        <progress id="progress" aria-label="Game loading progress"></progress>
+        <span id="status">Loading game…</span>
+    </div>
+    <script>
+        const loading = document.getElementById('loading');
+        const progress = document.getElementById('progress');
+        const status = document.getElementById('status');
+
+        window.spd = {
+            progress(done, total) {
+                if (total > 0) {
+                    progress.max = total;
+                    progress.value = done;
+                    status.textContent = `Loading assets… ${done}/${total} (${Math.floor(done * 100 / total)}%)`;
+                }
+            },
+            loaded() {
+                status.textContent = 'Starting game…';
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    loading.hidden = true;
+                    document.getElementById('canvas').focus();
+                }));
+            },
+            crash(message) {
+                loading.hidden = false;
+                progress.hidden = true;
+                status.textContent = message;
+            }
+        };
+
+        window.addEventListener('load', () => {
+            if (typeof main !== 'function') return;
+            status.textContent = 'Loading assets…';
+
+            try {
+                main();
+            } catch (error) {
+                window.spd.crash(`Unable to start the game. Please reload.\n${error.message}`);
+            }
+        });
+    </script>
+    <script defer src="spd.js" onerror="window.spd.crash('Unable to download the game. Please check your connection and reload.')"></script>
+</body>
+</html>

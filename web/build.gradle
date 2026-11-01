@@ -144,8 +144,7 @@ processResources.dependsOn 'generateReflectionList'
 // Web asset folder: the game's assets, preloaded behind the loading screen.
 def webAssets = layout.buildDirectory.dir('web-assets')
 tasks.register('stageWebAssets', Sync) {
-    from(coreAssets)
-    from(new File(project(':ios').projectDir, 'assets/music')) { into 'music' }
+    from(coreAssets) { exclude 'music/**' }
     // the fallback font (CJK and system font option) ships with the desktop build, as on desktop
     from(new File(project(':desktop').projectDir, 'src/main/assets')) { include 'fonts/**' }
     dependsOn 'generateReflectionList'
@@ -159,7 +158,7 @@ gdxTeaVM {
     webDefaults {
         mainClass.set(mainClassName)
         htmlTitle.set(appName)
-        generateIndexHtml.set(true)
+        generateIndexHtml.set(false)
         copyLoadingAsset.set(false)
         // the game is large; TeaVM needs more heap than the Gradle daemon has
         outOfProcess.set(true)
@@ -196,4 +195,31 @@ tasks.withType(org.teavm.gradle.tasks.TeaVMTask).configureEach {
 
 tasks.matching { it.name.startsWith('gdx_teavm_') || it.name.startsWith('generateJavaScript') }.configureEach {
     dependsOn 'generateReflectionList', 'stageWebAssets'
+}
+
+// Publish music alongside the app without adding it to the startup preload manifest.
+def webMusic = layout.buildDirectory.dir('web-music')
+tasks.register('stageWebMusic', Sync) {
+    from(new File(coreAssets, 'music'))
+    from(new File(project(':ios').projectDir, 'assets/music'))
+    into webMusic
+}
+
+def webOutputs = [
+        'gdx_teavm_web_js_build': 'dist/js/webapp',
+        'gdx_teavm_web_js_debug_build': 'dist/js/debug/webapp'
+]
+tasks.matching { webOutputs.containsKey(it.name) }.configureEach {
+    dependsOn 'stageWebMusic'
+    doLast {
+        def site = layout.buildDirectory.dir(webOutputs[name]).get()
+        copy {
+            from 'webapp/index.html'
+            into site
+        }
+        copy {
+            from webMusic
+            into site.dir('assets/music')
+        }
+    }
 }

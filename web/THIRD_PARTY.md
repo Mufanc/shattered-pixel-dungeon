@@ -20,3 +20,8 @@ Upstream projects:
 - https://github.com/00-Evan/shattered-pixel-dungeon
 - https://github.com/xpenatan/gdx-teavm
 - https://github.com/konsoletyper/teavm
+
+The `LazyMusic` adapter in `WebAudioSupport.java` is adapted from
+[goddeaterr/web-pixeldungeon](https://github.com/goddeaterr/web-pixeldungeon/blob/main/html/src/main/java/com/shatteredpixel/shatteredpixeldungeon/html/WebAudioSupport.java),
+under GPL-3.0-or-later. Its deferred playback state and game-thread completion
+handling are retained; local integration delegates to the existing Howler backend.

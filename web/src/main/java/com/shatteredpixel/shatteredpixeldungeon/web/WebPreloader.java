@@ -25,7 +25,7 @@ public class WebPreloader extends ApplicationAdapter {
 		loader.preload(new AssetLoaderListener<Void>() {
 			@Override
 			public void onSuccess(String url, Void result) {
-				total = loader.getQueue();
+				total = loader.getQueue() + loader.getDownloadingCount();
 			}
 
 			@Override
@@ -41,7 +41,7 @@ public class WebPreloader extends ApplicationAdapter {
 		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		if (total < 0 || done) return;
 
-		int remaining = loader.getQueue();
+		int remaining = loader.getQueue() + loader.getDownloadingCount();
 		WebJS.loadProgress(total - remaining, total);
 		if (remaining == 0 && !loader.isDownloading()) {
 			done = true;

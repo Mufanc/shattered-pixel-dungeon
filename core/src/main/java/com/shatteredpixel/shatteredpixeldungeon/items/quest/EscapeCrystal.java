@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
@@ -298,6 +299,8 @@ public class EscapeCrystal extends Item {
 	public static String ENERGY     = "energy";
 
 	public void storeHeroBelongings( Hero hero ){
+		RingOfGuarding guarding = RingOfGuarding.isActive(hero) ? hero.belongings.getItem(RingOfGuarding.class) : null;
+
 		storedItems = new Bundle();
 
 		Bundle belongings = new Bundle();
@@ -315,6 +318,11 @@ public class EscapeCrystal extends Item {
 		updateQuickslot();
 		Dungeon.gold = Dungeon.energy = 0;
 		hero.belongings.clear();
+
+		if (guarding != null) {
+			hero.belongings.ring = guarding;
+			guarding.activate(hero);
+		}
 	}
 
 	public void restoreHeroBelongings( Hero hero, Item preserve ){

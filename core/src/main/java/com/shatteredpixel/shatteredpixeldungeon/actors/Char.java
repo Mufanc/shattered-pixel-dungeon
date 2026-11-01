@@ -510,7 +510,15 @@ public abstract class Char extends Actor {
 				return true;
 			}
 
+			int preHP = Math.max(0, enemy.HP);
+
 			enemy.damage( effectiveDamage, this );
+
+			RingOfGuarding.Guarding guarding = buff(RingOfGuarding.Guarding.class);
+
+			if (guarding != null) {
+				guarding.onAttack(preHP - Math.max(0, enemy.HP));
+			}
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);
 			if (buff(FrostImbue.class) != null) buff(FrostImbue.class).proc(enemy);
@@ -634,7 +642,7 @@ public abstract class Char extends Actor {
 			defStat = INFINITE_EVASION;
 		}
 
-		if (RingOfGuarding.isActive(defender) && Random.Int(2) == 0) {
+		if (RingOfGuarding.isActive(defender) && Random.Float() < 1f - defender.HP / (2f * defender.HT)) {
 			hitMissIcon = FloatingText.MISS_EVA;
 			return false;
 		}
@@ -956,6 +964,10 @@ public abstract class Char extends Actor {
 			if (dmg < 0) dmg = 0;
 		}
 		
+		if (RingOfGuarding.isActive(this)) {
+			dmg /= 2;
+		}
+
 		if (buff( Paralysis.class ) != null) {
 			buff( Paralysis.class ).processDamage(dmg);
 		}

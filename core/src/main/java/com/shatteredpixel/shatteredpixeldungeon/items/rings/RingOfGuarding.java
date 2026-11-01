@@ -24,7 +24,9 @@ package com.shatteredpixel.shatteredpixeldungeon.items.rings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.watabou.utils.Bundle;
 
@@ -40,6 +42,7 @@ public class RingOfGuarding extends Ring {
 
 	private int regenerationTurns;
 	private int healingRemainder;
+	private int lifeStealRemainder;
 
 	@Override
 	public void reset() {
@@ -87,6 +90,7 @@ public class RingOfGuarding extends Ring {
 		super.storeInBundle(bundle);
 		bundle.put("regeneration_turns", regenerationTurns);
 		bundle.put("healing_remainder", healingRemainder);
+		bundle.put("life_steal_remainder", lifeStealRemainder);
 	}
 
 	@Override
@@ -94,12 +98,34 @@ public class RingOfGuarding extends Ring {
 		super.restoreFromBundle(bundle);
 		regenerationTurns = bundle.getInt("regeneration_turns");
 		healingRemainder = bundle.getInt("healing_remainder");
+		lifeStealRemainder = bundle.getInt("life_steal_remainder");
 	}
 
 	public class Guarding extends RingBuff {
 
 		{
 			spend(TICK);
+		}
+
+		public void onAttack(int damage) {
+			if (damage <= 0 || !target.isAlive() || !isActive(target) || !isEquipped((Hero) target)) {
+				return;
+			}
+
+			lifeStealRemainder += damage;
+
+			int healing = Math.min(target.HT - target.HP, lifeStealRemainder / 5);
+
+			lifeStealRemainder %= 5;
+			target.HP += healing;
+
+			if (target.HP == target.HT) {
+				lifeStealRemainder = 0;
+			}
+
+			if (healing > 0 && target.sprite != null) {
+				target.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(healing), FloatingText.HEALING);
+			}
 		}
 
 		@Override
@@ -111,8 +137,8 @@ public class RingOfGuarding extends Ring {
 					regenerationTurns = 0;
 
 					if (target.HP < target.HT) {
-						// Keep hundredths so 2% healing is exact even at low maximum health.
-						healingRemainder += target.HT * 2;
+						// Keep hundredths so 3% healing is exact even at low maximum health.
+						healingRemainder += target.HT * 3;
 						target.HP = Math.min(target.HT, target.HP + healingRemainder / 100);
 						healingRemainder %= 100;
 					}

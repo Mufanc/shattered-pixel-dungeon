@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.VialOfBlood;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -171,10 +172,11 @@ public class Waterskin extends Item {
 		return volume >= MAX_VOLUME;
 	}
 
-	public void collectDew( Dewdrop dew ) {
+	public void collectDew( Dewdrop dew, Hero hero ) {
 
 		GLog.i( Messages.get(this, "collected") );
-		volume += dew.quantity;
+		volume += dew.quantity * (RingOfGuarding.isActive(hero) ? 2 : 1);
+
 		if (volume >= MAX_VOLUME) {
 			volume = MAX_VOLUME;
 			GLog.p( Messages.get(this, "full") );

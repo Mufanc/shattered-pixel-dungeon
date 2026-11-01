@@ -2014,8 +2014,15 @@ public class Hero extends Char {
 
 		//xp granted by ascension challenge is only for on-exp gain effects
 		if (source != AscensionChallenge.class) {
+			exp *= RingOfGuarding.isActive(this) ? 2 : 1;
+
+			if (exp > 0 && sprite != null) {
+				sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(exp), FloatingText.EXPERIENCE);
+			}
+
 			this.exp += exp;
 		}
+
 		float percent = exp/(float)maxExp();
 
 		EtherealChains.chainsRecharge chains = buff(EtherealChains.chainsRecharge.class);

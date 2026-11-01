@@ -71,6 +71,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TalismanOfForesi
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.exotic.ExoticPotion;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfGuarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfWealth;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ExoticScroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfAggression;
@@ -978,6 +979,14 @@ public abstract class Mob extends Char {
 			
 			if (alignment == Alignment.ENEMY) {
 				Statistics.enemiesSlain++;
+
+				if (RingOfGuarding.isActive(Dungeon.hero)) {
+					Buff.affect(Dungeon.hero, Hunger.class).satisfy(10);
+					Dungeon.hero.HTBoost++;
+					Dungeon.hero.updateHT(false);
+					Dungeon.hero.HP = Math.min(Dungeon.hero.HT, Dungeon.hero.HP + 1);
+				}
+
 				Badges.validateMonstersSlain();
 				Statistics.qualifiedForNoKilling = false;
 				Bestiary.setSeen(getClass());
@@ -995,9 +1004,6 @@ public abstract class Mob extends Char {
 					exp = Math.round(10 * spawningWeight());
 				}
 
-				if (exp > 0) {
-					Dungeon.hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(exp), FloatingText.EXPERIENCE);
-				}
 				Dungeon.hero.earnExp(exp, getClass());
 				//in the vault level we manually progress ring IDing. 5 enemies defeated to an ID
 				if (exp == 0 && Dungeon.level instanceof VaultLevel){

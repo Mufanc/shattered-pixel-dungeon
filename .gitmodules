@@ -1,0 +1,8 @@
+[submodule "vendor/teavm"]
+	path = vendor/teavm
+	url = https://github.com/Mufanc/teavm.git
+	branch = master
+[submodule "vendor/gdx-teavm"]
+	path = vendor/gdx-teavm
+	url = https://github.com/Mufanc/gdx-teavm.git
+	branch = master
